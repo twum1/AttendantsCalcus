@@ -1,26 +1,30 @@
 import { useState } from "react";
 import "./MobileCalcApp.css";
 
+// Function to safely evaluate expressions
+const safeEvaluate = (expression) => {
+  try {
+    // Remove any characters that aren't numbers, +, -, *, /, or parentheses
+    const sanitizedExpression = expression.replace(/[^0-9+\-*/().]/g, "");
+
+    // Use JavaScript's built-in Function constructor safely
+    return Function(`"use strict"; return (${sanitizedExpression})`)();
+  } catch {
+    return "";
+  }
+};
+
 export default function MobileCalcApp() {
   const [inputs, setInputs] = useState({ oldMeter: "", newMeter: "", price: "1" });
-
-  const evaluateExpression = (value) => {
-    try {
-      const sanitizedValue = value.replace(/[^-+*/0-9().]/g, "");
-      return sanitizedValue ? new Function(`return ${sanitizedValue}`)() : 0;
-    } catch {
-      return "";
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputs({ ...inputs, [name]: value });
   };
 
-  const oldValue = evaluateExpression(inputs.oldMeter);
-  const newValue = evaluateExpression(inputs.newMeter);
-  const priceValue = evaluateExpression(inputs.price);
+  const oldValue = safeEvaluate(inputs.oldMeter);
+  const newValue = safeEvaluate(inputs.newMeter);
+  const priceValue = safeEvaluate(inputs.price);
 
   const totalSales = newValue - oldValue;
   const result = totalSales * priceValue;
