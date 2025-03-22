@@ -1,21 +1,18 @@
 import { useState } from "react";
+import { evaluate } from "mathjs"; // Import mathjs for safe evaluation
 import "./MobileCalcApp.css";
-
-// Function to safely evaluate expressions
-const safeEvaluate = (expression) => {
-  try {
-    // Remove any characters that aren't numbers, +, -, *, /, or parentheses
-    const sanitizedExpression = expression.replace(/[^0-9+\-*/().]/g, "");
-
-    // Use JavaScript's built-in Function constructor safely
-    return Function(`"use strict"; return (${sanitizedExpression})`)();
-  } catch {
-    return "";
-  }
-};
 
 export default function MobileCalcApp() {
   const [inputs, setInputs] = useState({ oldMeter: "", newMeter: "", price: "1" });
+
+  // Function to safely evaluate expressions
+  const safeEvaluate = (expression) => {
+    try {
+      return evaluate(expression); // mathjs safely evaluates expressions
+    } catch {
+      return 0; // Return 0 if there's an error
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
